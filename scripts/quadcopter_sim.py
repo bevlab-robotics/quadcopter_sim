@@ -25,24 +25,27 @@ class quadcopter:
         # simulates using Newton-Euler equations
         # dt is step time in seconds
 
+        # Determine state derivatives
         pdot = self.v # time derivative of position
         vdot = 1/self.m*self.f # time derivative of velocity
         Rdot = self.R.dot(skew(self.w).dot(self.R.T))  # time derivative of rotation matrix
         # Rdot = R*S(w)*R^T
         wdot = np.linalg.inv(self.I).dot(self.tau - skew(self.w).dot(self.I).dot(self.w))   # time derivative of angular velocity
-        #  tau  = I*wdot + w x I*w
+        #  tau  = I*wdot + S(w)*I*w
+        #  wdot = inv(I)*(tau-S(w)*I*w)
 
-        # Forward Euler method
+        # Forward Euler method - integrate state derivatives one time step
         self.p += dt*pdot
         self.v += dt*vdot
         self.w += dt*wdot
-        self.R = self.R.dot(expm(dt*self.R.dot(skew(self.w)))) # geodesic in SO(3) exponential map
+        # For rotation matrix use exponential map - geodesic in SO(3)
+        self.R = self.R.dot(expm(dt*self.R.dot(skew(self.w)))) #
         # R = R*expm(dt*R*S(w))
 
     def rccommand2tau(self):
         #
         tau = 0.0
-        reuturn tau
+        return tau
 
 
 
